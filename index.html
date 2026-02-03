@@ -3,75 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KOHAKU POKER BASE - CRM</title>
+    <title>KOHAKU POKER BASE - PREMIMUM CRM</title>
     <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     <style>
         :root {
             --casino-green: #073b1e;
-            --table-green: #0a4d2d;
-            --gold: #d4af37;
-            --dark-card: rgba(20, 20, 20, 0.95);
-            --text-light: #f0f0f0;
+            --table-green: #0d5d36;
+            --gold: #ffca28;
+            --gold-glow: #ffd700;
+            --text-light: #ffffff;
         }
 
         body { 
-            font-family: sans-serif; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
             background-color: var(--casino-green);
             background-image: radial-gradient(circle at center, var(--table-green) 0%, var(--casino-green) 100%);
             color: var(--text-light); 
             margin: 0; padding: 15px; 
             min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .container { max-width: 600px; margin: auto; }
+        /* 浮遊するトランプ記号のアニメーション */
+        .bg-symbols {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: -1; font-size: 2rem; opacity: 0.1;
+        }
+        .symbol { position: absolute; animation: float 15s infinite linear; }
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
+        }
+
+        .container { max-width: 600px; margin: auto; position: relative; z-index: 1; }
         
         h1 { 
-            color: var(--gold); text-align: center; font-size: 1.6rem;
-            border-bottom: 2px solid var(--gold); padding-bottom: 10px;
+            color: var(--gold); text-align: center; font-size: 2.2rem;
+            letter-spacing: 4px; margin-bottom: 30px;
+            text-shadow: 0 0 15px var(--gold-glow), 2px 2px 4px #000;
+            font-weight: 900;
         }
 
         .card { 
-            background: var(--dark-card); padding: 20px; border-radius: 15px; 
-            border: 1px solid var(--gold); margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(10px);
+            padding: 25px; border-radius: 20px; 
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            margin-bottom: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
-        .form-group { margin-bottom: 15px; }
-        .row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .row > div { flex: 1; }
-
-        label { display: block; margin-bottom: 4px; font-size: 0.8rem; color: var(--gold); font-weight: bold; }
+        label { display: block; margin-bottom: 6px; font-size: 0.85rem; color: var(--gold); font-weight: bold; }
 
         input { 
-            width: 100%; padding: 12px; font-size: 16px; 
-            border-radius: 6px; border: 1px solid #444; 
-            background: #2a2a2a; color: white; box-sizing: border-box; 
+            width: 100%; padding: 14px; font-size: 16px; 
+            border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); 
+            background: rgba(0, 0, 0, 0.4); color: white; box-sizing: border-box; 
+            transition: 0.3s;
         }
+        input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px var(--gold-glow); }
+
+        .row { display: flex; gap: 12px; margin-bottom: 15px; }
+        .row > div { flex: 1; }
 
         .btn-main { 
-            background: linear-gradient(135deg, #d4af37, #aa8a2e);
-            color: #1a1a1a; border: none; padding: 16px; 
-            border-radius: 8px; font-size: 16px; font-weight: bold; 
-            width: 100%; cursor: pointer; margin-top: 15px;
+            background: linear-gradient(135deg, #ffd700, #b8860b);
+            color: #1a1a1a; border: none; padding: 18px; 
+            border-radius: 12px; font-size: 18px; font-weight: 900; 
+            width: 100%; cursor: pointer; margin-top: 20px;
+            text-shadow: 1px 1px 0 rgba(255,255,255,0.3);
+            box-shadow: 0 6px 0 #7a6320, 0 10px 20px rgba(0,0,0,0.4);
         }
+        .btn-main:active { transform: translateY(4px); box-shadow: 0 2px 0 #7a6320; }
 
         .member-item {
-            background: rgba(0,0,0,0.6); border-radius: 12px;
-            padding: 15px; margin-bottom: 12px; border: 1px solid #444;
+            background: rgba(0, 0, 0, 0.5); border-radius: 15px;
+            padding: 20px; margin-bottom: 15px; 
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative; overflow: hidden;
+        }
+        .member-item::before {
+            content: "♠️"; position: absolute; right: -10px; bottom: -10px;
+            font-size: 5rem; opacity: 0.05; pointer-events: none;
         }
 
-        .chip-display { font-size: 1.4rem; font-weight: bold; color: #00ff88; margin: 8px 0; }
+        .chip-display { 
+            font-size: 1.8rem; font-weight: bold; color: #00ff88; margin: 10px 0;
+            font-family: 'Courier New', monospace; text-shadow: 0 0 10px rgba(0,255,136,0.4);
+        }
         
-        .info-detail { font-size: 0.75rem; color: #bbb; line-height: 1.5; margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px; }
+        .info-detail { font-size: 0.8rem; color: #ccc; line-height: 1.6; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; }
 
-        .controls { display: flex; gap: 8px; margin-top: 10px; }
-        .btn-sm { padding: 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; flex: 1; font-weight: bold; color: #fff; }
-        .plus { background: #1b5e20; }
-        .minus { background: #b71c1c; }
+        .controls { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-sm { padding: 12px; font-size: 14px; border-radius: 8px; border: none; cursor: pointer; flex: 1; font-weight: bold; color: #fff; }
+        .plus { background: rgba(40, 167, 69, 0.8); }
+        .minus { background: rgba(220, 53, 69, 0.8); }
 
-        .search-box { margin-bottom: 20px; border: 2px solid var(--gold); background: rgba(0,0,0,0.5); width: 100%; box-sizing: border-box; padding: 12px; color: white; border-radius: 8px;}
+        .search-box { 
+            margin-bottom: 25px; border: 2px solid var(--gold); 
+            background: rgba(0,0,0,0.7); width: 100%; padding: 15px; 
+            color: white; border-radius: 12px; font-size: 16px;
+        }
     </style>
 </head>
 <body>
+
+<div class="bg-symbols" id="bgSymbols"></div>
 
 <div class="container">
     <h1>KOHAKU POKER BASE</h1>
@@ -79,68 +117,80 @@
     <div class="card h-adr">
         <span class="p-country-name" style="display:none;">Japan</span>
 
-        <div class="form-group">
-            <label>プレイヤ名</label>
-            <input type="text" id="playerName" placeholder="SHARK">
+        <div class="row">
+            <div style="flex: 2;">
+                <label>プレイヤ名</label>
+                <input type="text" id="playerName" placeholder="SHARK">
+            </div>
+            <div style="flex: 1;">
+                <label>初期チップ</label>
+                <input type="number" id="initialChips" value="0">
+            </div>
         </div>
 
         <div class="row">
             <div>
-                <label>姓（本名）</label>
+                <label>姓</label>
                 <input type="text" id="lastName" placeholder="山田">
             </div>
             <div>
-                <label>名（本名）</label>
+                <label>名</label>
                 <input type="text" id="firstName" placeholder="太郎">
             </div>
         </div>
 
-        <div class="form-group">
-            <label>フリガナ</label>
-            <input type="text" id="ruby" placeholder="ヤマダ タロウ">
-        </div>
-
         <div class="row">
-            <div>
+            <div style="flex: 2;">
+                <label>フリガナ</label>
+                <input type="text" id="ruby" placeholder="ヤマダ タロウ">
+            </div>
+            <div style="flex: 1;">
                 <label>生年月日</label>
                 <input type="date" id="birthDate">
             </div>
+        </div>
+
+        <div class="row">
             <div>
                 <label>電話番号</label>
                 <input type="tel" id="phone" placeholder="09012345678">
             </div>
-        </div>
-
-        <div class="row">
-            <div style="flex: 0 0 40%;">
+            <div>
                 <label>郵便番号</label>
                 <input type="text" id="zip" class="p-postal-code" placeholder="1234567">
-            </div>
-            <div style="flex: 0 0 60%;">
-                <label>住所（自動入力）</label>
-                <input type="text" id="address" class="p-region p-locality p-street-address p-extended-address" placeholder="自動入力されます">
             </div>
         </div>
 
         <div class="form-group">
-            <label>初期預けチップ</label>
-            <input type="number" id="initialChips" value="0">
+            <label>住所</label>
+            <input type="text" id="address" class="p-region p-locality p-street-address p-extended-address" placeholder="自動入力されます">
         </div>
 
         <button class="btn-main" onclick="registerMember()">COMPLETE REGISTRATION</button>
     </div>
 
-    <input type="text" id="search" class="search-box" placeholder="名前で検索..." oninput="render()">
+    <input type="text" id="search" class="search-box" placeholder="🔍 会員を検索..." oninput="render()">
 
     <div id="memberList"></div>
 </div>
 
 <script>
-    // データの読み込み
-    let members = JSON.parse(localStorage.getItem('kohakuDataV2') || '[]');
+    // トランプの背景アニメーション生成
+    const symbols = ['♠️','♥️','♣️','♦️'];
+    const bg = document.getElementById('bgSymbols');
+    for(let i=0; i<15; i++) {
+        const div = document.createElement('div');
+        div.className = 'symbol';
+        div.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+        div.style.left = Math.random()*100 + '%';
+        div.style.animationDelay = Math.random()*15 + 's';
+        bg.appendChild(div);
+    }
+
+    let members = JSON.parse(localStorage.getItem('kohakuDataV3') || '[]');
 
     function save() {
-        localStorage.setItem('kohakuDataV2', JSON.stringify(members));
+        localStorage.setItem('kohakuDataV3', JSON.stringify(members));
         render();
     }
 
@@ -162,15 +212,12 @@
         };
 
         members.push(newMember);
-        
-        // 入力欄をクリア
         ["playerName", "lastName", "firstName", "ruby", "birthDate", "phone", "zip", "address"].forEach(id => {
             document.getElementById(id).value = "";
         });
         document.getElementById('initialChips').value = "0";
-        
         save();
-        alert("登録が完了しました");
+        alert("Welcome to KOHAKU POKER BASE!");
     }
 
     function updateChips(id, amount) {
@@ -179,7 +226,7 @@
     }
 
     function deleteMember(id) {
-        if(confirm("このデータを削除しますか？")) {
+        if(confirm("データを削除しますか？")) {
             members = members.filter(m => m.id !== id);
             save();
         }
@@ -192,7 +239,8 @@
 
         const filtered = members.filter(m => 
             m.pName.toLowerCase().includes(searchTerm) || 
-            m.lName.toLowerCase().includes(searchTerm)
+            m.lName.toLowerCase().includes(searchTerm) ||
+            m.ruby.includes(searchTerm)
         );
 
         filtered.forEach(m => {
@@ -201,16 +249,15 @@
             item.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div>
-                        <strong style="font-size:1.2rem; color:var(--gold);">${m.pName}</strong> 
-                        <span style="font-size:0.8rem; color:#888;">(${m.lName} ${m.fName})</span>
+                        <strong style="font-size:1.3rem; color:var(--gold);">${m.pName}</strong> 
+                        <span style="font-size:0.85rem; color:#aaa;"> - ${m.lName} ${m.fName}</span>
                         <div class="chip-display">💰 ${m.chips.toLocaleString()} pts</div>
                     </div>
-                    <button onclick="deleteMember(${m.id})" style="background:none; border:none; color:#555; cursor:pointer; font-size:1.2rem;">×</button>
+                    <button onclick="deleteMember(${m.id})" style="background:none; border:none; color:#555; cursor:pointer; font-size:1.5rem;">×</button>
                 </div>
                 <div class="info-detail">
-                    カナ: ${m.ruby} / 生年月日: ${m.birth}<br>
-                    TEL: ${m.phone}<br>
-                    住所: 〒${m.zip} ${m.addr}
+                    🎂 ${m.birth} / 📞 ${m.phone}<br>
+                    📍 〒${m.zip} ${m.addr}
                 </div>
                 <div class="controls">
                     <button class="btn-sm plus" onclick="updateChips(${m.id}, 100)">+100</button>
@@ -223,7 +270,6 @@
         });
     }
 
-    // 初回表示
     render();
 </script>
 
