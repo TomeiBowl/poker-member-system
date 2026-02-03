@@ -62,7 +62,6 @@
             color: white; border-radius: 10px; font-size: 16px; box-sizing: border-box;
         }
 
-        /* 会員リスト表示 */
         .member-item {
             background: rgba(255, 255, 255, 0.1); border-radius: 12px;
             padding: 15px; margin-bottom: 12px; border: 1px solid rgba(255,215,0,0.2);
@@ -145,7 +144,6 @@
 </div>
 
 <script>
-    // データの読み込み（継続性を確保）
     const storageKeys = ['kohakuDataV3', 'kohakuDataV2', 'kohakuPokerData', 'pokerBankProData'];
     let members = [];
     
@@ -230,10 +228,10 @@
                     〒${m.zip} ${m.addr}
                 </div>
                 <div class="controls">
-                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 100)">♠ +100</button>
-                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 1000)">♣ +1k</button>
-                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -100)">♥ -100</button>
-                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -1000)">♦ -1k</button>
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 1)">♠ +1</button>
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 10)">♣ +10</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -1)">♥ -1</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -10)">♦ -10</button>
                 </div>
             `;
             listDiv.appendChild(item);
