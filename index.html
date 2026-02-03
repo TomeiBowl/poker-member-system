@@ -139,4 +139,109 @@
         <button class="btn-main" onclick="registerMember()">♠ 会員登録を完了する ♠</button>
     </div>
 
-    <input type="
+    <input type="text" id="search" class="search-box" placeholder="🔍 名前・フリガナであいまい検索..." onkeyup="render()">
+
+    <div id="memberList"></div>
+</div>
+
+<script>
+    // データの読み込み（継続性を確保）
+    const storageKeys = ['kohakuDataV3', 'kohakuDataV2', 'kohakuPokerData', 'pokerBankProData'];
+    let members = [];
+    
+    for (let key of storageKeys) {
+        const data = localStorage.getItem(key);
+        if (data) {
+            members = JSON.parse(data);
+            break; 
+        }
+    }
+
+    function save() {
+        localStorage.setItem('kohakuDataV3', JSON.stringify(members));
+        render();
+    }
+
+    function registerMember() {
+        const pName = document.getElementById('playerName').value;
+        if(!pName) { alert("プレイヤ名を入力してください"); return; }
+
+        const newMember = {
+            id: Date.now(),
+            pName: pName,
+            lName: document.getElementById('lastName').value,
+            fName: document.getElementById('firstName').value,
+            ruby: document.getElementById('ruby').value,
+            birth: document.getElementById('birthDate').value,
+            phone: document.getElementById('phone').value,
+            zip: document.getElementById('zip').value,
+            addr: document.getElementById('address').value,
+            chips: parseInt(document.getElementById('initialChips').value) || 0
+        };
+
+        members.push(newMember);
+        ["playerName", "lastName", "firstName", "ruby", "birthDate", "phone", "zip", "address"].forEach(id => {
+            document.getElementById(id).value = "";
+        });
+        document.getElementById('initialChips').value = "0";
+        save();
+        alert("Welcome to KOHAKU POKER BASE!");
+    }
+
+    function updateChips(id, amount) {
+        const m = members.find(m => m.id === id);
+        if (m) { m.chips += amount; if (m.chips < 0) m.chips = 0; save(); }
+    }
+
+    function deleteMember(id) {
+        if(confirm("このデータを削除しますか？")) {
+            members = members.filter(m => m.id !== id);
+            save();
+        }
+    }
+
+    function render() {
+        const listDiv = document.getElementById('memberList');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        listDiv.innerHTML = "";
+
+        const filtered = members.filter(m => {
+            return (m.pName && m.pName.toLowerCase().includes(searchTerm)) || 
+                   (m.lName && m.lName.toLowerCase().includes(searchTerm)) ||
+                   (m.fName && m.fName.toLowerCase().includes(searchTerm)) ||
+                   (m.ruby && m.ruby.includes(searchTerm));
+        });
+
+        filtered.reverse().forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'member-item';
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <div class="player-name-display">♠ ${m.pName} ♠</div> 
+                        <span style="font-size:0.85rem; color:#aaa;">(${m.lName} ${m.fName})</span>
+                        <div class="chip-display">💰 ${m.chips.toLocaleString()} pts</div>
+                    </div>
+                    <button onclick="deleteMember(${m.id})" style="background:none; border:none; color:#777; cursor:pointer; font-size:1.5rem;">×</button>
+                </div>
+                <div class="info-detail">
+                    カナ: ${m.ruby} / 誕: ${m.birth}<br>
+                    TEL: ${m.phone}<br>
+                    〒${m.zip} ${m.addr}
+                </div>
+                <div class="controls">
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 100)">♠ +100</button>
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 1000)">♣ +1k</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -100)">♥ -100</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -1000)">♦ -1k</button>
+                </div>
+            `;
+            listDiv.appendChild(item);
+        });
+    }
+
+    window.onload = render;
+</script>
+
+</body>
+</html>
