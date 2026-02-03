@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ポーカー会員登録 - モバイル版</title>
+    <style>
+        :root {
+            --primary-color: #e64a19;
+            --bg-dark: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+        }
+
+        body { 
+            font-family: sans-serif; 
+            background-color: var(--bg-dark); 
+            color: var(--text-color); 
+            margin: 0; 
+            padding: 15px; 
+        }
+
+        .container { max-width: 600px; margin: auto; }
+        
+        h1 { color: #ffca28; text-align: center; font-size: 1.5rem; }
+
+        .card { 
+            background: var(--card-bg); 
+            padding: 20px; 
+            border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #bbb; }
+
+        /* 入力欄をスマホでタップしやすく大きくする */
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            font-size: 16px; /* 16px以上にするとiPhoneでズームを防げます */
+            border-radius: 8px; 
+            border: 1px solid #444; 
+            background: #2a2a2a; 
+            color: white; 
+            box-sizing: border-box; 
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+
+        button { 
+            flex: 1;
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: bold; 
+            cursor: pointer;
+        }
+
+        .btn-export { background-color: #455a64; }
+
+        /* 一覧表をスマホで見やすくする設定 */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
+        th, td { border-bottom: 1px solid #333; padding: 12px 8px; text-align: left; }
+        th { color: #ffca28; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>♠️ POKER REGISTRATION</h1>
+    
+    <div class="card">
+        <form id="regForm">
+            <div class="form-group">
+                <label>プレイヤ名</label>
+                <input type="text" id="playerName" placeholder="例: SHARK" required>
+            </div>
+            <div class="form-group">
+                <label>本名</label>
+                <input type="text" id="realName" placeholder="例: 山田 太郎" required>
+            </div>
+            <div class="form-group">
+                <label>ランク</label>
+                <select id="level">
+                    <option value="Beginner">Beginner</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Pro">Pro</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <button type="submit">登録</button>
+                <button type="button" class="btn-export" onclick="exportCSV()">CSV出力</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table id="memberTable">
+            <thead>
+                <tr>
+                    <th>プレイヤ名</th>
+                    <th>レベル</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const regForm = document.getElementById('regForm');
+    const memberTable = document.getElementById('memberTable').getElementsByTagName('tbody')[0];
+
+    // 保存データの読み込み
+    function loadData() {
+        const savedData = JSON.parse(localStorage.getItem('pokerMembers') || '[]');
+        memberTable.innerHTML = "";
+        savedData.forEach(member => {
+            const row = memberTable.insertRow();
+            row.innerHTML = `<td>${member.playerName}</td><td>${member.level}</td>`;
+        });
+    }
+
+    // 登録処理
+    regForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newMember = {
+            playerName: document.getElementById('playerName').value,
+            realName: document.getElementById('realName').value,
+            level: document.getElementById('level').value
+        };
+        const savedData = JSON.parse(localStorage.getItem('pokerMembers') || '[]');
+        savedData.push(newMember);
+        localStorage.setItem('pokerMembers', JSON.stringify(savedData));
+        regForm.reset();
+        loadData();
+        alert("登録が完了しました！");
+    });
+
+    // CSV出力機能
+    function exportCSV() {
+        const savedData = JSON.parse(localStorage.getItem('pokerMembers') || '[]');
+        if (savedData.length === 0) return alert("データがありません");
+
+        let csvContent = "プレイヤ名,本名,レベル\n";
+        savedData.forEach(m => {
+            csvContent += `${m.playerName},${m.realName},${m.level}\n`;
+        });
+
+        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "poker_members.csv";
+        link.click();
+    }
+
+    window.onload = loadData;
+</script>
+
+</body>
+</html>
