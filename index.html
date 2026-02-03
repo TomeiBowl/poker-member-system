@@ -3,165 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ポーカー会員登録 - モバイル版</title>
+    <title>POKER BANK - 会員・チップ管理Pro</title>
     <style>
         :root {
-            --primary-color: #e64a19;
-            --bg-dark: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #ffffff;
+            --casino-green: #0a4d2d;
+            --gold: #d4af37;
+            --dark-card: #1e1e1e;
+            --text-light: #f0f0f0;
         }
 
         body { 
-            font-family: sans-serif; 
-            background-color: var(--bg-dark); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 15px; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            background-color: var(--casino-green); 
+            color: var(--text-light); 
+            margin: 0; padding: 15px; 
         }
 
-        .container { max-width: 600px; margin: auto; }
+        .container { max-width: 800px; margin: auto; }
         
-        h1 { color: #ffca28; text-align: center; font-size: 1.5rem; }
+        h1 { color: var(--gold); text-align: center; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
 
         .card { 
-            background: var(--card-bg); 
+            background: var(--dark-card); 
             padding: 20px; 
             border-radius: 15px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            border: 2px solid var(--gold);
+            margin-bottom: 25px;
         }
 
-        .form-group { margin-bottom: 20px; }
-        
-        label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #bbb; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: var(--gold); font-weight: bold; }
 
-        /* 入力欄をスマホでタップしやすく大きくする */
         input, select { 
-            width: 100%; 
-            padding: 12px; 
-            font-size: 16px; /* 16px以上にするとiPhoneでズームを防げます */
-            border-radius: 8px; 
-            border: 1px solid #444; 
-            background: #2a2a2a; 
-            color: white; 
-            box-sizing: border-box; 
+            width: 100%; padding: 10px; font-size: 16px; 
+            border-radius: 6px; border: 1px solid #444; 
+            background: #2a2a2a; color: white; box-sizing: border-box; 
         }
 
-        .btn-group { display: flex; gap: 10px; }
-
-        button { 
-            flex: 1;
-            background-color: var(--primary-color); 
-            color: white; 
-            border: none; 
-            padding: 15px; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer;
+        .btn-main { 
+            background: linear-gradient(135deg, #d4af37, #aa8a2e);
+            color: #1a1a1a; border: none; padding: 15px; 
+            border-radius: 8px; font-size: 16px; font-weight: bold; 
+            width: 100%; cursor: pointer; margin-top: 10px;
         }
 
-        .btn-export { background-color: #455a64; }
+        /* 会員リストのデザイン */
+        .member-item {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 5px solid var(--gold);
+        }
 
-        /* 一覧表をスマホで見やすくする設定 */
-        .table-container { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
-        th, td { border-bottom: 1px solid #333; padding: 12px 8px; text-align: left; }
-        th { color: #ffca28; }
+        .chip-display { font-size: 1.3rem; font-weight: bold; color: #00ff88; margin: 5px 0; }
+        .info-detail { font-size: 0.8rem; color: #bbb; line-height: 1.4; border-top: 1px solid #444; pt: 8px; margin-top: 8px; }
+
+        .controls { display: flex; gap: 5px; margin-top: 10px; }
+        .btn-sm { padding: 8px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; flex: 1; }
+        .plus { background: #28a745; color: white; }
+        .minus { background: #dc3545; color: white; }
+        .search-box { margin-bottom: 15px; border: 2px solid var(--gold); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>♠️ POKER REGISTRATION</h1>
+    <h1>♠️ POKER BANK Pro</h1>
     
     <div class="card">
-        <form id="regForm">
-            <div class="form-group">
-                <label>プレイヤ名</label>
-                <input type="text" id="playerName" placeholder="例: SHARK" required>
-            </div>
-            <div class="form-group">
-                <label>本名</label>
-                <input type="text" id="realName" placeholder="例: 山田 太郎" required>
-            </div>
-            <div class="form-group">
-                <label>ランク</label>
-                <select id="level">
-                    <option value="Beginner">Beginner</option>
-                    <option value="Regular">Regular</option>
-                    <option value="Pro">Pro</option>
-                </select>
-            </div>
-            <div class="btn-group">
-                <button type="submit">登録</button>
-                <button type="button" class="btn-export" onclick="exportCSV()">CSV出力</button>
-            </div>
-        </form>
+        <div class="form-group">
+            <label>プレイヤ名</label>
+            <input type="text" id="playerName" placeholder="例: SHARK" required>
+        </div>
+        <div class="form-group">
+            <label>生年月日</label>
+            <input type="date" id="birthDate">
+        </div>
+        <div class="form-group">
+            <label>電話番号</label>
+            <input type="tel" id="phone" placeholder="090-0000-0000">
+        </div>
+        <div class="form-group">
+            <label>住所</label>
+            <input type="text" id="address" placeholder="都道府県から入力">
+        </div>
+        <div class="form-group">
+            <label>初期預けチップ</label>
+            <input type="number" id="initialChips" value="0">
+        </div>
+        <button class="btn-main" onclick="registerMember()">新規会員登録</button>
     </div>
 
-    <div class="table-container">
-        <table id="memberTable">
-            <thead>
-                <tr>
-                    <th>プレイヤ名</th>
-                    <th>レベル</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-    </div>
+    <input type="text" id="search" class="search-box" placeholder="名前で検索..." oninput="render()">
+
+    <div id="memberList"></div>
 </div>
 
 <script>
-    const regForm = document.getElementById('regForm');
-    const memberTable = document.getElementById('memberTable').getElementsByTagName('tbody')[0];
+    let members = JSON.parse(localStorage.getItem('pokerBankProData') || '[]');
 
-    // 保存データの読み込み
-    function loadData() {
-        const savedData = JSON.parse(localStorage.getItem('pokerMembers') || '[]');
-        memberTable.innerHTML = "";
-        savedData.forEach(member => {
-            const row = memberTable.insertRow();
-            row.innerHTML = `<td>${member.playerName}</td><td>${member.level}</td>`;
+    function save() {
+        localStorage.setItem('pokerBankProData', JSON.stringify(members));
+        render();
+    }
+
+    function registerMember() {
+        const name = document.getElementById('playerName').value;
+        const birth = document.getElementById('birthDate').value;
+        const phone = document.getElementById('phone').value;
+        const addr = document.getElementById('address').value;
+        const chips = parseInt(document.getElementById('initialChips').value) || 0;
+
+        if(!name) return alert("プレイヤ名を入力してください");
+
+        members.push({
+            id: Date.now(),
+            name: name,
+            birth: birth || "未入力",
+            phone: phone || "未入力",
+            address: addr || "未入力",
+            chips: chips
+        });
+
+        // フォームリセット
+        document.getElementById('playerName').value = "";
+        document.getElementById('birthDate').value = "";
+        document.getElementById('phone').value = "";
+        document.getElementById('address').value = "";
+        document.getElementById('initialChips').value = "0";
+        
+        save();
+    }
+
+    function updateChips(id, amount) {
+        const member = members.find(m => m.id === id);
+        if (member) {
+            member.chips += amount;
+            if (member.chips < 0) member.chips = 0;
+            save();
+        }
+    }
+
+    function deleteMember(id) {
+        if(confirm("この会員データを完全に削除しますか？")) {
+            members = members.filter(m => m.id !== id);
+            save();
+        }
+    }
+
+    function render() {
+        const listDiv = document.getElementById('memberList');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        listDiv.innerHTML = "";
+
+        const filtered = members.filter(m => m.name.toLowerCase().includes(searchTerm));
+
+        filtered.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'member-item';
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <strong style="font-size:1.1rem; color:var(--gold);">${m.name}</strong>
+                        <div class="chip-display">💰 ${m.chips.toLocaleString()} pts</div>
+                    </div>
+                    <button onclick="deleteMember(${m.id})" style="background:none; border:none; color:#666; font-size:1.2rem;">×</button>
+                </div>
+                
+                <div class="info-detail">
+                    🎂 生年月日: ${m.birth}<br>
+                    📞 TEL: ${m.phone}<br>
+                    🏠 住所: ${m.address}
+                </div>
+
+                <div class="controls">
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 100)">+100</button>
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 1000)">+1k</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -100)">-100</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -1000)">-1k</button>
+                </div>
+            `;
+            listDiv.appendChild(item);
         });
     }
 
-    // 登録処理
-    regForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newMember = {
-            playerName: document.getElementById('playerName').value,
-            realName: document.getElementById('realName').value,
-            level: document.getElementById('level').value
-        };
-        const savedData = JSON.parse(localStorage.getItem('pokerMembers') || '[]');
-        savedData.push(newMember);
-        localStorage.setItem('pokerMembers', JSON.stringify(savedData));
-        regForm.reset();
-        loadData();
-        alert("登録が完了しました！");
-    });
-
-    // CSV出力機能
-    function exportCSV() {
-        const savedData = JSON.parse(localStorage.getItem('pokerMembers') || '[]');
-        if (savedData.length === 0) return alert("データがありません");
-
-        let csvContent = "プレイヤ名,本名,レベル\n";
-        savedData.forEach(m => {
-            csvContent += `${m.playerName},${m.realName},${m.level}\n`;
-        });
-
-        const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "poker_members.csv";
-        link.click();
-    }
-
-    window.onload = loadData;
+    window.onload = render;
 </script>
 
 </body>
