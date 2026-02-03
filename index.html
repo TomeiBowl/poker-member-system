@@ -3,193 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POKER BANK - 会員・チップ管理Pro</title>
+    <title>KOHAKU POKER BASE - CRM</title>
+    <script src="https://yubinbango.github.io/yubinbango/yubinbango.js" charset="UTF-8"></script>
     <style>
         :root {
-            --casino-green: #0a4d2d;
+            --casino-green: #073b1e;
+            --table-green: #0a4d2d;
             --gold: #d4af37;
-            --dark-card: #1e1e1e;
+            --dark-card: rgba(20, 20, 20, 0.95);
             --text-light: #f0f0f0;
         }
 
         body { 
             font-family: 'Helvetica Neue', Arial, sans-serif; 
-            background-color: var(--casino-green); 
+            background-color: var(--casino-green);
+            background-image: radial-gradient(circle at center, var(--table-green) 0%, var(--casino-green) 100%);
             color: var(--text-light); 
             margin: 0; padding: 15px; 
+            min-height: 100vh;
         }
 
         .container { max-width: 800px; margin: auto; }
         
-        h1 { color: var(--gold); text-align: center; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-
-        .card { 
-            background: var(--dark-card); 
-            padding: 20px; 
-            border-radius: 15px; 
-            border: 2px solid var(--gold);
-            margin-bottom: 25px;
+        h1 { 
+            color: var(--gold); text-align: center; font-size: 1.8rem; letter-spacing: 2px;
+            margin-bottom: 25px; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            border-bottom: 2px solid var(--gold); padding-bottom: 10px;
         }
 
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 4px; font-size: 0.85rem; color: var(--gold); font-weight: bold; }
+        .card { 
+            background: var(--dark-card); padding: 20px; border-radius: 15px; 
+            border: 1px solid var(--gold); margin-bottom: 25px;
+        }
 
-        input, select { 
-            width: 100%; padding: 10px; font-size: 16px; 
+        .form-group { margin-bottom: 15px; }
+        .row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .row > div { flex: 1; }
+
+        label { display: block; margin-bottom: 4px; font-size: 0.8rem; color: var(--gold); font-weight: bold; }
+
+        input { 
+            width: 100%; padding: 12px; font-size: 16px; 
             border-radius: 6px; border: 1px solid #444; 
             background: #2a2a2a; color: white; box-sizing: border-box; 
         }
 
         .btn-main { 
             background: linear-gradient(135deg, #d4af37, #aa8a2e);
-            color: #1a1a1a; border: none; padding: 15px; 
+            color: #1a1a1a; border: none; padding: 16px; 
             border-radius: 8px; font-size: 16px; font-weight: bold; 
-            width: 100%; cursor: pointer; margin-top: 10px;
+            width: 100%; cursor: pointer; margin-top: 15px;
+            box-shadow: 0 4px 0 #7a6320;
         }
 
-        /* 会員リストのデザイン */
         .member-item {
-            background: rgba(0,0,0,0.4);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 12px;
-            border-left: 5px solid var(--gold);
+            background: rgba(0,0,0,0.6); border-radius: 12px;
+            padding: 15px; margin-bottom: 12px; border: 1px solid #444;
         }
 
-        .chip-display { font-size: 1.3rem; font-weight: bold; color: #00ff88; margin: 5px 0; }
-        .info-detail { font-size: 0.8rem; color: #bbb; line-height: 1.4; border-top: 1px solid #444; pt: 8px; margin-top: 8px; }
+        .chip-display { font-size: 1.4rem; font-weight: bold; color: #00ff88; margin: 8px 0; }
+        
+        .info-detail { font-size: 0.75rem; color: #bbb; line-height: 1.5; margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px; }
 
-        .controls { display: flex; gap: 5px; margin-top: 10px; }
-        .btn-sm { padding: 8px; font-size: 12px; border-radius: 4px; border: none; cursor: pointer; flex: 1; }
-        .plus { background: #28a745; color: white; }
-        .minus { background: #dc3545; color: white; }
-        .search-box { margin-bottom: 15px; border: 2px solid var(--gold); }
+        .controls { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-sm { padding: 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; flex: 1; font-weight: bold; color: #fff; }
+        .plus { background: #1b5e20; }
+        .minus { background: #b71c1c; }
+
+        .search-box { margin-bottom: 20px; border: 2px solid var(--gold); background: rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>♠️ POKER BANK Pro</h1>
+    <h1>KOHAKU POKER BASE</h1>
     
-    <div class="card">
-        <div class="form-group">
-            <label>プレイヤ名</label>
-            <input type="text" id="playerName" placeholder="例: SHARK" required>
-        </div>
-        <div class="form-group">
-            <label>生年月日</label>
-            <input type="date" id="birthDate">
-        </div>
-        <div class="form-group">
-            <label>電話番号</label>
-            <input type="tel" id="phone" placeholder="090-0000-0000">
-        </div>
-        <div class="form-group">
-            <label>住所</label>
-            <input type="text" id="address" placeholder="都道府県から入力">
-        </div>
-        <div class="form-group">
-            <label>初期預けチップ</label>
-            <input type="number" id="initialChips" value="0">
-        </div>
-        <button class="btn-main" onclick="registerMember()">新規会員登録</button>
-    </div>
-
-    <input type="text" id="search" class="search-box" placeholder="名前で検索..." oninput="render()">
-
-    <div id="memberList"></div>
-</div>
-
-<script>
-    let members = JSON.parse(localStorage.getItem('pokerBankProData') || '[]');
-
-    function save() {
-        localStorage.setItem('pokerBankProData', JSON.stringify(members));
-        render();
-    }
-
-    function registerMember() {
-        const name = document.getElementById('playerName').value;
-        const birth = document.getElementById('birthDate').value;
-        const phone = document.getElementById('phone').value;
-        const addr = document.getElementById('address').value;
-        const chips = parseInt(document.getElementById('initialChips').value) || 0;
-
-        if(!name) return alert("プレイヤ名を入力してください");
-
-        members.push({
-            id: Date.now(),
-            name: name,
-            birth: birth || "未入力",
-            phone: phone || "未入力",
-            address: addr || "未入力",
-            chips: chips
-        });
-
-        // フォームリセット
-        document.getElementById('playerName').value = "";
-        document.getElementById('birthDate').value = "";
-        document.getElementById('phone').value = "";
-        document.getElementById('address').value = "";
-        document.getElementById('initialChips').value = "0";
-        
-        save();
-    }
-
-    function updateChips(id, amount) {
-        const member = members.find(m => m.id === id);
-        if (member) {
-            member.chips += amount;
-            if (member.chips < 0) member.chips = 0;
-            save();
-        }
-    }
-
-    function deleteMember(id) {
-        if(confirm("この会員データを完全に削除しますか？")) {
-            members = members.filter(m => m.id !== id);
-            save();
-        }
-    }
-
-    function render() {
-        const listDiv = document.getElementById('memberList');
-        const searchTerm = document.getElementById('search').value.toLowerCase();
-        listDiv.innerHTML = "";
-
-        const filtered = members.filter(m => m.name.toLowerCase().includes(searchTerm));
-
-        filtered.forEach(m => {
-            const item = document.createElement('div');
-            item.className = 'member-item';
-            item.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <div>
-                        <strong style="font-size:1.1rem; color:var(--gold);">${m.name}</strong>
-                        <div class="chip-display">💰 ${m.chips.toLocaleString()} pts</div>
-                    </div>
-                    <button onclick="deleteMember(${m.id})" style="background:none; border:none; color:#666; font-size:1.2rem;">×</button>
-                </div>
-                
-                <div class="info-detail">
-                    🎂 生年月日: ${m.birth}<br>
-                    📞 TEL: ${m.phone}<br>
-                    🏠 住所: ${m.address}
-                </div>
-
-                <div class="controls">
-                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 100)">+100</button>
-                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 1000)">+1k</button>
-                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -100)">-100</button>
-                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -1000)">-1k</button>
-                </div>
-            `;
-            listDiv.appendChild(item);
-        });
-    }
-
-    window.onload = render;
-</script>
-
-</body>
-</html>
+    <div class="card h-adr">
