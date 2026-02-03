@@ -79,3 +79,153 @@
     <h1>KOHAKU POKER BASE</h1>
     
     <div class="card h-adr">
+        <span class="p-country-name" style="display:none;">Japan</span>
+
+        <div class="form-group">
+            <label>プレイヤ名（ニックネーム）</label>
+            <input type="text" id="playerName" placeholder="SHARK" required>
+        </div>
+
+        <div class="row">
+            <div>
+                <label>姓（本名）</label>
+                <input type="text" id="lastName" placeholder="山田">
+            </div>
+            <div>
+                <label>名（本名）</label>
+                <input type="text" id="firstName" placeholder="太郎">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>フリガナ</label>
+            <input type="text" id="ruby" placeholder="ヤマダ タロウ">
+        </div>
+
+        <div class="row">
+            <div>
+                <label>生年月日</label>
+                <input type="date" id="birthDate">
+            </div>
+            <div>
+                <label>電話番号</label>
+                <input type="tel" id="phone" placeholder="09012345678">
+            </div>
+        </div>
+
+        <div class="row">
+            <div style="flex: 0 0 40%;">
+                <label>郵便番号</label>
+                <input type="text" id="zip" class="p-postal-code" placeholder="1234567">
+            </div>
+            <div style="flex: 0 0 60%;">
+                <label>住所（自動入力）</label>
+                <input type="text" id="address" class="p-region p-locality p-street-address p-extended-address" placeholder="市区町村以降">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>初期預けチップ</label>
+            <input type="number" id="initialChips" value="0">
+        </div>
+
+        <button class="btn-main" onclick="registerMember()">COMPLETE REGISTRATION</button>
+    </div>
+
+    <input type="text" id="search" class="search-box" placeholder="Search Player..." oninput="render()">
+
+    <div id="memberList"></div>
+</div>
+
+<script>
+    let members = JSON.parse(localStorage.getItem('kohakuPokerData') || '[]');
+
+    function save() {
+        localStorage.setItem('kohakuPokerData', JSON.stringify(members));
+        render();
+    }
+
+    function registerMember() {
+        const data = {
+            id: Date.now(),
+            pName: document.getElementById('playerName').value,
+            lName: document.getElementById('lastName').value,
+            fName: document.getElementById('firstName').value,
+            ruby: document.getElementById('ruby').value,
+            birth: document.getElementById('birthDate').value,
+            phone: document.getElementById('phone').value,
+            zip: document.getElementById('zip').value,
+            addr: document.getElementById('address').value,
+            chips: parseInt(document.getElementById('initialChips').value) || 0
+        };
+
+        if(!data.pName) return alert("プレイヤ名を入力してください");
+
+        members.push(data);
+        
+        // フォームのリセット
+        ["playerName", "lastName", "firstName", "ruby", "birthDate", "phone", "zip", "address"].forEach(id => {
+            document.getElementById(id).value = "";
+        });
+        document.getElementById('initialChips').value = "0";
+        
+        save();
+    }
+
+    function updateChips(id, amount) {
+        const m = members.find(m => m.id === id);
+        if (m) { m.chips += amount; if (m.chips < 0) m.chips = 0; save(); }
+    }
+
+    function deleteMember(id) {
+        if(confirm("データを削除しますか？")) {
+            members = members.filter(m => m.id !== id);
+            save();
+        }
+    }
+
+    function render() {
+        const listDiv = document.getElementById('memberList');
+        const searchTerm = document.getElementById('search').value.toLowerCase();
+        listDiv.innerHTML = "";
+
+        const filtered = members.filter(m => 
+            m.pName.toLowerCase().includes(searchTerm) || 
+            m.lName.toLowerCase().includes(searchTerm)
+        );
+
+        filtered.forEach(m => {
+            const item = document.createElement('div');
+            item.className = 'member-item';
+            item.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <div>
+                        <strong style="font-size:1.2rem; color:var(--gold);">${m.pName}</strong> 
+                        <span style="font-size:0.8rem; color:#888;">(${m.lName} ${m.fName})</span>
+                        <div class="chip-display">💰 ${m.chips.toLocaleString()} pts</div>
+                    </div>
+                    <button onclick="deleteMember(${m.id})" style="background:none; border:none; color:#555; cursor:pointer; font-size:1.2rem;">×</button>
+                </div>
+                
+                <div class="info-detail">
+                    カナ: ${m.ruby} / 誕: ${m.birth}<br>
+                    TEL: ${m.phone}<br>
+                    〒${m.zip} ${m.addr}
+                </div>
+
+                <div class="controls">
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 100)">+100</button>
+                    <button class="btn-sm plus" onclick="updateChips(${m.id}, 1000)">+1k</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -100)">-100</button>
+                    <button class="btn-sm minus" onclick="updateChips(${m.id}, -1000)">-1k</button>
+                </div>
+            `;
+            listDiv.appendChild(item);
+        });
+    }
+
+    window.onload = render;
+</script>
+
+</body>
+</html>
